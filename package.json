@@ -1,0 +1,26 @@
+{
+  "name": "vuexus",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Spoki4",
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "Spoki4",
+      "email": "ivan.sherstnyuk@gmail.com"
+    }
+  ],
+  "devDependencies": {
+    "@types/jest": "^25.2.1",
+    "jest": "^26.0.1",
+    "ts-jest": "^25.5.0",
+    "typescript": "^3.8.3",
+    "vuex": "^3.3.0"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
+  }
+}
