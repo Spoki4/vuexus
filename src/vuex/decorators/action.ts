@@ -7,6 +7,6 @@ export const isAction = (target, key) => {
   return Reflect.hasMetadata(actionMetadataKey, target, key)
 }
 
-export const Action = (target, key, descriptor: ActionDescriptor) => {
+export const Action = (target, key, _descriptor: ActionDescriptor) => {
   Reflect.defineMetadata(actionMetadataKey, {}, target, key)
 }

@@ -64,8 +64,7 @@ describe('Class must be transform to vuex format', () => {
   test('Modules', () => {
     const vuexModule = extractClassToVuex(PageModule)
 
-    expect(vuexModule.modules.test.state()).toEqual({
-      state: 1
-    })
+    expect(vuexModule.modules.test.state()).toEqual({state: 1})
+    expect(Object.keys(vuexModule.modules.test.getters)).toEqual(['getMyState'])
   })
 })
