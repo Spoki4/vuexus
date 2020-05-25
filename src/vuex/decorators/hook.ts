@@ -1,9 +1,5 @@
 import {Action, ActionDescriptor} from './action'
-
-const hookMetadataKey = {
-  created: '__hook:created__',
-  queryChanged: '__hook:queryChanged__'
-}
+import {hookMetadataKey} from './constants'
 
 const Created = (target, key, descriptor: ActionDescriptor) => {
   Action(target, key, descriptor)

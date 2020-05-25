@@ -1,7 +1,7 @@
 import 'reflect-metadata'
-export type ActionDescriptor =  TypedPropertyDescriptor<(payload?:any) => Promise<any>>
+import {actionMetadataKey} from './constants'
 
-export const actionMetadataKey = '__action__'
+export type ActionDescriptor =  TypedPropertyDescriptor<(payload?:any) => Promise<any>>
 
 export const isAction = (target, key) => {
   return Reflect.hasMetadata(actionMetadataKey, target, key)

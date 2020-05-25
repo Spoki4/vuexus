@@ -1,27 +1,29 @@
 import Vue from 'vue'
-import {extractedModuleCacheKey} from './decorators'
+import {extractedModuleMetadataKey} from './decorators'
+import {createProxy} from './proxy'
 import { ObjectClass } from './vue'
 
 const getClasses = (stores?: ObjectClass) => {
-  return Object.values(stores || {})
+  return Object.entries(stores || {})
 }
 
 const VuexusGlobalMixin = Vue.extend({
   beforeCreate() {
     const stores = getClasses(this.$options.stores)
 
-    stores.forEach(StoreClass => {
-      const isStore = Reflect.hasMetadata(extractedModuleCacheKey, StoreClass)
+    stores.forEach(([key, StoreClass]) => {
+      const isStore = Reflect.hasMetadata(extractedModuleMetadataKey, StoreClass)
       if (!isStore) {
         return console.warn(`${StoreClass.name} not a Module, maybe you forgot @Store decorator`)
       }
-      const vuexModule = Reflect.getMetadata(extractedModuleCacheKey, StoreClass)
+      const vuexModule = Reflect.getMetadata(extractedModuleMetadataKey, StoreClass)
       this.$store.registerModule(StoreClass.name, vuexModule)
+      this[key] = createProxy({Class: StoreClass, store: this.$store})
     })
   },
   created() {
     const stores = getClasses(this.$options.stores)
-    stores.forEach(StoreClass => {
+    stores.forEach(([key, StoreClass]) => {
       // Call Hook.Created handler
     })
   },
@@ -29,17 +31,19 @@ const VuexusGlobalMixin = Vue.extend({
     '$router.query': {
       handler() {
         const stores = getClasses(this.$options.stores)
-        stores.forEach(StoreClass => {
+        stores.forEach(([key, StoreClass]) => {
           // Call Hook.QueryChanged handler
         })
       }
     }
   },
   destroyed() {
-    const stores = getClasses(this.$options.stores)
+    this.$nextTick(() => {
+      const stores = getClasses(this.$options.stores)
 
-    stores.forEach(StoreClass => {
-      this.$store.unregisterModule(StoreClass.name)
+      stores.forEach(([key, StoreClass]) => {
+        this.$store.unregisterModule(StoreClass.name)
+      })
     })
   }
 })

@@ -1,10 +1,9 @@
 import {extractClassToVuex} from '../extract'
-
-export const extractedModuleCacheKey = '__extracted-module-cache__'
+import {extractedModuleMetadataKey, storeNameMetadataKey} from './constants'
 
 export const Store = (target) => {
   const vuexModule = extractClassToVuex(target)
-  Reflect.defineMetadata(extractedModuleCacheKey, vuexModule, target)
-
+  Reflect.defineMetadata(extractedModuleMetadataKey, vuexModule, target)
+  Reflect.defineMetadata(storeNameMetadataKey, target.name, target)
   return target
 }

@@ -25,7 +25,7 @@ const extractState = (Class) => {
   const state: Record<string, any> = {}
 
   for (const field of Object.getOwnPropertyNames(instance)) {
-      state[field] = instance[field]
+    state[field] = instance[field]
   }
 
   return {
