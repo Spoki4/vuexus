@@ -10,3 +10,4 @@ export const hookMetadataKey = {
 export const extractedModuleMetadataKey = '__extracted-module-cache__'
 export const storeNameMetadataKey = '__store-name__'
 export const gettersNamesMetadataKey = '__getters__'
+export const mutationsNamesMetadataKey = '__mutations__'

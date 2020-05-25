@@ -2,7 +2,7 @@ require('jsdom-global')()
 import {createLocalVue, mount} from '@vue/test-utils'
 import Vue from 'vue'
 import Vuex, {Store as VuexStore} from 'vuex'
-import {Getter, Mutation, Store} from '../decorators'
+import {clearStoreCache, Getter, Mutation, Store} from '../decorators'
 import {Plugin} from '../plugin'
 import '../vue'
 
@@ -29,6 +29,10 @@ describe('Vuex e2e', () => {
     localVue.use(Vuex)
     store = new VuexStore({})
     localVue.use(Plugin)
+  })
+
+  afterEach(() => {
+    clearStoreCache(MainStore)
   })
 
   describe('direct access', () => {
@@ -146,7 +150,31 @@ describe('Vuex e2e', () => {
         localVue,
         store
       })
-      expect(wrapper.html()).toMatchInlineSnapshot('"<div>2</div>"')
+      expect(wrapper.html()).toMatchInlineSnapshot('"<div>1</div>"')
+    })
+
+    it('should be a equals 3 after call mutation', async () => {
+      const SimpleComponent = Vue.extend({
+        template: '<div>{{ mainStore.a }}</div>',
+        stores: {
+          mainStore: MainStore
+        },
+        methods: {
+          changeA() {
+            this.mainStore.setA(3)
+          }
+        }
+      })
+
+      const wrapper = await mount(SimpleComponent, {
+        localVue,
+        store
+      })
+
+      wrapper.vm.changeA()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.html()).toMatchInlineSnapshot('"<div>3</div>"')
     })
   })
 
