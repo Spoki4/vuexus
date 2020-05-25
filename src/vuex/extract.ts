@@ -1,4 +1,5 @@
 import {getSubModuleClass, isAction, isGetter, isMutation, isSubModule} from './decorators'
+import {createProxy} from './proxy'
 
 /**
  * Class to vuex module object
@@ -50,7 +51,14 @@ const extractMethodsAndSubModules = (Class) => {
     } else if (isMutation(cls, field)) {
       mutations[field] = (state, payload) => cls[field].call(state, payload)
     } else if (isAction(cls, field)) {
-      actions[field] = (ctx, payload) => cls[field].call(ctx, payload)
+
+      actions[field] = (ctx, payload) => {
+        const localCtx = createProxy({
+          Class,
+          store: ctx
+        })
+        return cls[field].call(localCtx, payload)
+      }
     }
   }
 

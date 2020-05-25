@@ -2,7 +2,7 @@ require('jsdom-global')()
 import {createLocalVue, mount} from '@vue/test-utils'
 import Vue from 'vue'
 import Vuex, {Store as VuexStore} from 'vuex'
-import {clearStoreCache, Getter, Mutation, Store} from '../decorators'
+import {Action, clearStoreCache, Getter, Mutation, Store} from '../decorators'
 import {Plugin} from '../plugin'
 import '../vue'
 
@@ -17,6 +17,10 @@ class MainStore {
 
   @Mutation setA(a: number) {
     this.a = a
+  }
+
+  @Action async asyncSetATo22() {
+    this.setA(22)
   }
 }
 
@@ -175,6 +179,30 @@ describe('Vuex e2e', () => {
       await wrapper.vm.$nextTick()
 
       expect(wrapper.html()).toMatchInlineSnapshot('"<div>3</div>"')
+    })
+
+    it('should be equals 3 after call action', async () => {
+      const SimpleComponent = Vue.extend({
+        template: '<div>{{ mainStore.a }}</div>',
+        stores: {
+          mainStore: MainStore
+        },
+        methods: {
+          changeA() {
+            this.mainStore.asyncSetATo22()
+          }
+        }
+      })
+
+      const wrapper = await mount(SimpleComponent, {
+        localVue,
+        store
+      })
+
+      wrapper.vm.changeA()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.html()).toMatchInlineSnapshot('"<div>22</div>"')
     })
   })
 

@@ -1,6 +1,6 @@
 import {Module, Store as VuexStore} from 'vuex'
 import {extractedModuleMetadataKey} from './decorators'
-import {gettersNamesMetadataKey, mutationsNamesMetadataKey} from './decorators/constants'
+import {actionsNamesMetadataKey, gettersNamesMetadataKey, mutationsNamesMetadataKey} from './decorators/constants'
 
 type CreateProxyOptions = {
   Class: { new() },
@@ -13,8 +13,9 @@ export const createProxy = (opts: CreateProxyOptions) => {
   const proxyObj = {}
 
   createStateProxy(opts, proxyObj, vuexModule.state())
-  createGetterProxy(opts, proxyObj)
-  createMutationProxy(opts, proxyObj)
+  createGettersProxy(opts, proxyObj)
+  createMutationsProxy(opts, proxyObj)
+  createActionsProxy(opts, proxyObj)
 
   return proxyObj
 }
@@ -32,7 +33,7 @@ const createStateProxy = (opts: CreateProxyOptions, proxyObj, state: {}) => {
   }
 }
 
-const createGetterProxy = (opts: CreateProxyOptions, proxyObj) => {
+const createGettersProxy = (opts: CreateProxyOptions, proxyObj) => {
   // from: ClassName.getterName
   // to: store.getters[`ClassName/getterName`]
 
@@ -47,7 +48,7 @@ const createGetterProxy = (opts: CreateProxyOptions, proxyObj) => {
   })
 }
 
-const createMutationProxy = (opts: CreateProxyOptions, proxyObj) => {
+const createMutationsProxy = (opts: CreateProxyOptions, proxyObj) => {
   // from: ClassName.mutationName(payload)
   // to: store.commit(`ClassName/mutationName`, payload, { root: true })
 
@@ -55,5 +56,16 @@ const createMutationProxy = (opts: CreateProxyOptions, proxyObj) => {
 
   mutations.forEach(key => {
     proxyObj[key] = (payload: any) => opts.store.commit(`${opts.Class.name}/${key}`, payload, { root: true })
+  })
+}
+
+const createActionsProxy = (opts: CreateProxyOptions, proxyObj) => {
+  // from: ClassName.actionName(payload)
+  // to: store.dispatch(`ClassName/actionName`, payload, { root: true })
+
+  const actions = Reflect.getMetadata(actionsNamesMetadataKey, opts.Class.prototype) || []
+
+  actions.forEach(key => {
+    proxyObj[key] = (payload: any) => opts.store.dispatch(`${opts.Class.name}/${key}`, payload, { root: true })
   })
 }
