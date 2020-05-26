@@ -2,9 +2,22 @@ require('jsdom-global')()
 import {createLocalVue, mount} from '@vue/test-utils'
 import Vue from 'vue'
 import Vuex, {Store as VuexStore} from 'vuex'
-import {Action, clearStoreCache, Getter, Mutation, Store} from '../decorators'
+import {Action, clearStoreCache, Mutation, Store, createSubModule} from '../decorators'
 import {Plugin} from '../plugin'
 import '../vue'
+
+const createTest = () => {
+  @Store class FactorySubModule {
+    data = 'submodule data'
+
+    get getMyData() { return this.data }
+
+    @Mutation setData(data: string) {
+      this.data = data
+    }
+  }
+  return createSubModule(FactorySubModule)
+}
 
 @Store
 class MainStore {
@@ -13,7 +26,9 @@ class MainStore {
     b: 'asd'
   }
 
-  @Getter getA() { return this.a + 1 }
+  subModule = createTest()
+
+  get getA() { return this.a + 1 }
 
   @Mutation setA(a: number) {
     this.a = a
@@ -203,6 +218,34 @@ describe('Vuex e2e', () => {
       await wrapper.vm.$nextTick()
 
       expect(wrapper.html()).toMatchInlineSnapshot('"<div>22</div>"')
+    })
+
+    it('should be submodule state getter', async () => {
+      const SimpleComponent = Vue.extend({
+        template: '<div>{{ data }}</div>',
+        stores: {
+          mainStore: MainStore
+        },
+        computed: {
+          data() {
+            return this.mainStore.subModule.getMyData
+          }
+        },
+        methods: {
+          updateSmth() {
+            this.mainStore.subModule.setData('updated')
+          }
+        }
+      })
+
+      const wrapper = await mount(SimpleComponent, {
+        localVue,
+        store
+      })
+      wrapper.vm.updateSmth()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.html()).toMatchInlineSnapshot('"<div>updated</div>"')
     })
   })
 

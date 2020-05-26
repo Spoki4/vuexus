@@ -1,23 +1,17 @@
 import 'reflect-metadata'
-import {SubModuleMetadataKey} from './constants'
 
-export const isSubModule = (target, key) => {
-  return Reflect.hasMetadata(SubModuleMetadataKey, target, key)
+type SubModule<T> = {
+  cls: T,
+  type: 'submodule'
 }
 
-export const getSubModuleClass = (target, key) => {
-  return Reflect.getMetadata(SubModuleMetadataKey, target, key)
+export const isSubModule = <T>(field: any): field is SubModule<T>  => {
+  return field?.type === 'submodule' && field?.cls
 }
 
-export const SubModule = (target, key) => {
-  const Class = Reflect.getMetadata('design:type', target, key)
-  Reflect.defineMetadata(SubModuleMetadataKey, Class, target, key)
+export const getSubModuleClass = <T>(field: SubModule<T>) => field.cls
 
-  const instance = new Class()
-
-  Object.defineProperty(target, key, {
-    get() {
-      return instance
-    }
-  })
+export const createSubModule = <T extends { new() }>(Class: T): InstanceType<T> => {
+  return {cls: Class, type: 'submodule'} as InstanceType<T>
 }
+

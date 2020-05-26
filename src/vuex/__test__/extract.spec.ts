@@ -1,39 +1,28 @@
-import {Action, Getter, Store, Mutation, Hook, SubModule} from '../index'
+import {Action, Store, Mutation, Hook, createSubModule} from '../index'
 import { extractClassToVuex } from '../extract'
 
 @Store
 class TestSubModule {
   state = 1
 
-  @Getter getMyState() { return this.state }
+  get getMyState() { return this.state }
 }
 
 @Store
 export class PageModule {
+  test = createSubModule(TestSubModule)
   data = []
 
-  @SubModule test!: TestSubModule
-
-  @Getter getMyData() {
+  get getMyData() {
     return this.data
   }
 
-  @Mutation setData(data) { this.data = data }
+  @Mutation setData() {}
 
-  @Action async loadSomeData(data) {
-    this.setData(data)
-  }
+  @Action async loadSomeData() {}
 
-  // Вызывается автоматически в соответствующем жизненом цикле
-  @Hook.Created async created(options) {
-    // options = {params: {}, query: {}, cookies: {}}
-    this.loadSomeData([123, 321, 456])
-  }
-
-  // Вызывается автоматически при изменении query параметров
-  @Hook.QueryChanged async onQueryUpdated(options) {
-    // options = {params: {}, query: {}, cookies: {}}
-  }
+  @Hook.Created async created() {}
+  @Hook.QueryChanged async onQueryUpdated() {}
 }
 
 describe('Class must be transform to vuex format', () => {
