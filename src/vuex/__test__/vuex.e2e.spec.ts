@@ -15,6 +15,10 @@ const createTest = () => {
     @Mutation setData(data: string) {
       this.data = data
     }
+
+    @Action async action(data: string) {
+      this.setData(data)
+    }
   }
   return createSubModule(FactorySubModule)
 }
@@ -141,6 +145,84 @@ describe('Vuex e2e', () => {
 
       expect(wrapper.html()).toMatchInlineSnapshot('"<div>2</div>"')
     })
+
+    it('should be getter submodule data', async () => {
+      const SimpleComponent = Vue.extend({
+        template: '<div>{{ $store.state.MainStore.subModule.data }}</div>',
+        stores: {
+          mainStore: MainStore
+        }
+      })
+
+      const wrapper = await mount(SimpleComponent, {
+        localVue,
+        store
+      })
+
+      expect(wrapper.html()).toMatchInlineSnapshot('"<div>submodule data</div>"')
+    })
+
+    it('should be get submodule data from store', async () => {
+      const SimpleComponent = Vue.extend({
+        template: '<div>{{ $store.getters[`MainStore/subModule/getMyData`] }}</div>',
+        stores: {
+          mainStore: MainStore
+        }
+      })
+
+      const wrapper = await mount(SimpleComponent, {
+        localVue,
+        store
+      })
+
+      expect(wrapper.html()).toMatchInlineSnapshot('"<div>submodule data</div>"')
+    })
+
+    it('should be get submodule data after call mutation', async () => {
+      const SimpleComponent = Vue.extend({
+        template: '<div>{{ $store.getters[`MainStore/subModule/getMyData`] }}</div>',
+        stores: {
+          mainStore: MainStore
+        },
+        methods: {
+          doSmth() {
+            this.$store.commit('MainStore/subModule/setData', 'mutation')
+          }
+        }
+      })
+
+      const wrapper = await mount(SimpleComponent, {
+        localVue,
+        store
+      })
+      wrapper.vm.doSmth()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.html()).toMatchInlineSnapshot('"<div>mutation</div>"')
+    })
+
+    it('should be get submodule data after call action', async () => {
+      const SimpleComponent = Vue.extend({
+        template: '<div>{{ $store.state.MainStore.subModule.getMyData }}</div>',
+        stores: {
+          mainStore: MainStore
+        },
+        methods: {
+          doSmth() {
+            this.$store.dispatch('MainStore/subModule/action', 'action')
+          }
+        }
+      })
+
+      const wrapper = await mount(SimpleComponent, {
+        localVue,
+        store
+      })
+      wrapper.vm.doSmth()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.html()).toMatchInlineSnapshot('"<div>action</div>"')
+    })
   })
 
   describe('proxied access', () => {
@@ -220,6 +302,30 @@ describe('Vuex e2e', () => {
       expect(wrapper.html()).toMatchInlineSnapshot('"<div>22</div>"')
     })
 
+    it('should be get deep', async () => {
+      const SimpleComponent = Vue.extend({
+        template: '<div>{{ mainStore.deep.b }}</div>',
+        stores: {
+          mainStore: MainStore
+        },
+        methods: {
+          changeA() {
+            this.mainStore.asyncSetATo22()
+          }
+        }
+      })
+
+      const wrapper = await mount(SimpleComponent, {
+        localVue,
+        store
+      })
+
+      wrapper.vm.changeA()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.html()).toMatchInlineSnapshot('"<div>asd</div>"')
+    })
+
     it('should be submodule state getter', async () => {
       const SimpleComponent = Vue.extend({
         template: '<div>{{ data }}</div>',
@@ -247,25 +353,6 @@ describe('Vuex e2e', () => {
 
       expect(wrapper.html()).toMatchInlineSnapshot('"<div>updated</div>"')
     })
-  })
-
-  it('should be print warning when try to use class without decorator', async () => {
-    class A {}
-    const SimpleComponent = Vue.extend({
-      template: '<div></div>',
-      stores: {
-        mainStore: A
-      }
-    })
-
-    jest.spyOn(global.console, 'warn')
-
-    await mount(SimpleComponent, {
-      localVue,
-      store
-    })
-
-    expect(global.console.warn).toBeCalled()
   })
 
   it('should be unregistered after component destroyed', async () => {

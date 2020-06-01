@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import {extractedModuleMetadataKey} from './decorators'
+import {extractClassToVuex} from './extract'
 import {createProxy} from './proxy'
 import { ObjectClass } from './vue'
 
@@ -12,11 +12,7 @@ const VuexusGlobalMixin = Vue.extend({
     const stores = getClasses(this.$options.stores)
 
     stores.forEach(([key, StoreClass]) => {
-      const isStore = Reflect.hasMetadata(extractedModuleMetadataKey, StoreClass)
-      if (!isStore) {
-        return console.warn(`${StoreClass.name} not a Module, maybe you forgot @Store decorator`)
-      }
-      const vuexModule = Reflect.getMetadata(extractedModuleMetadataKey, StoreClass)
+      const vuexModule = extractClassToVuex(StoreClass)
       this.$store.registerModule(StoreClass.name, vuexModule)
       this[key] = createProxy({Class: StoreClass, store: this.$store})
     })

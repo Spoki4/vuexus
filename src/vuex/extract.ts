@@ -1,5 +1,5 @@
 import {isAction, isMutation} from './decorators'
-import {getSubModuleClass, isSubModule} from './decorators/submodule'
+import {getSubModuleClass, isSubModule} from './submodule'
 import {createProxy} from './proxy'
 
 /**
@@ -57,7 +57,6 @@ const extractMethodsAndSubModules = (Class) => {
     } else if (isMutation(cls, field)) {
       mutations[field] = (state, payload) => cls[field].call(state, payload)
     } else if (isAction(cls, field)) {
-
       actions[field] = (ctx, payload) => {
         const localCtx = createProxy({
           Class,

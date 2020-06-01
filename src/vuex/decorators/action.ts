@@ -1,6 +1,5 @@
 import 'reflect-metadata'
-import {actionMetadataKey, actionsNamesMetadataKey} from './constants'
-import {addArrayKeyMetadata} from './utils'
+import {actionMetadataKey} from './constants'
 
 export type ActionDescriptor =  TypedPropertyDescriptor<(payload?:any) => Promise<any>>
 
@@ -10,5 +9,4 @@ export const isAction = (target, key) => {
 
 export const Action = (target, key, _descriptor: ActionDescriptor) => {
   Reflect.defineMetadata(actionMetadataKey, {}, target, key)
-  addArrayKeyMetadata(actionsNamesMetadataKey, key, target)
 }
