@@ -6,9 +6,20 @@ import {Action, clearStoreCache, Mutation, Store, createSubModule} from '../deco
 import {Plugin} from '../plugin'
 import '../vue'
 
+@Store
+class SumSubModule {
+  result = 0
+
+  @Mutation sum({ a, b }: {a: number, b: number}) {
+    this.result = a + b
+  }
+}
+
 const createTest = () => {
   @Store class FactorySubModule {
     data = 'submodule data'
+
+    sumModule = createSubModule(SumSubModule)
 
     get getMyData() { return this.data }
 
@@ -352,6 +363,34 @@ describe('Vuex e2e', () => {
       await wrapper.vm.$nextTick()
 
       expect(wrapper.html()).toMatchInlineSnapshot('"<div>updated</div>"')
+    })
+
+    it('deep submodule', async () => {
+      const SimpleComponent = Vue.extend({
+        template: '<div>{{ data }}</div>',
+        stores: {
+          mainStore: MainStore
+        },
+        computed: {
+          data() {
+            return this.mainStore.subModule.sumModule.result
+          }
+        },
+        methods: {
+          updateSmth() {
+            this.mainStore.subModule.sumModule.sum({a: 1, b: 3})
+          }
+        }
+      })
+
+      const wrapper = await mount(SimpleComponent, {
+        localVue,
+        store
+      })
+      wrapper.vm.updateSmth()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.html()).toMatchInlineSnapshot('"<div>4</div>"')
     })
   })
 
