@@ -203,7 +203,7 @@ describe('Vuex e2e', () => {
 
     it('should be get submodule data after call action', async () => {
       const SimpleComponent = Vue.extend({
-        template: '<div>{{ $store.state.MainStore.subModule.getMyData }}</div>',
+        template: '<div>{{ $store.getters["MainStore/subModule/getMyData"] }}</div>',
         stores: {
           mainStore: MainStore
         },
@@ -339,7 +339,7 @@ describe('Vuex e2e', () => {
         },
         methods: {
           updateSmth() {
-            this.mainStore.subModule.setData('updated')
+            this.mainStore.subModule.action('updated')
           }
         }
       })

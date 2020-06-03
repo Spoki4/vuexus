@@ -1,17 +1,18 @@
 import {Module, ModuleTree, Store as VuexStore} from 'vuex'
 import {extractClassToVuex} from './extract'
+import {getUnitPath} from './utils/unit-path'
 
 type CreateProxyOptions = {
   Class: { new() },
-  store: VuexStore<any>
+  store: VuexStore<any>,
+  modulePrefix?: string
 }
 
 export const createProxy = (opts: CreateProxyOptions) => {
-
   const vuexModule: Module<any, any> = extractClassToVuex(opts.Class)
 
   return createProxyFromVuexModule(vuexModule, {
-    modulePrefix: opts.Class.name,
+    modulePrefix: opts.modulePrefix || opts.Class.name,
     store: opts.store
   })
 }
@@ -95,4 +96,3 @@ const createSubModulesProxy = (opts: CreateProxyFromVuexModuleOptions, proxyObj,
 }
 
 
-const getUnitPath = (...args: (string | undefined | null)[]): string => args.reduce<string>((path, next) => `${path}${next ? `/${next}`: ''}`, '').slice(1)
