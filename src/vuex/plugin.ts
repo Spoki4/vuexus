@@ -19,16 +19,24 @@ const VuexusGlobalMixin = Vue.extend({
   },
   created() {
     const stores = getClasses(this.$options.stores)
+    const data = {
+      query: this.$route?.query || {},
+      params: this.$route?.params || {}
+    }
     stores.forEach(([key, StoreClass]) => {
-      (StoreClass.prototype.__created__ || []).forEach((actionKey) => this[key][actionKey]())
+      (StoreClass.prototype.__created__ || []).forEach((actionKey) => this[key][actionKey](data))
     })
   },
   watch: {
-    '$router.query': {
+    '$route.query': {
       handler() {
         const stores = getClasses(this.$options.stores)
+        const data = {
+          query: this.$route?.query || {},
+          params: this.$route?.params || {}
+        }
         stores.forEach(([key, StoreClass]) => {
-          (StoreClass.prototype.__queryChanged__ || []).forEach((actionKey) => this[key][actionKey]())
+          (StoreClass.prototype.__queryChanged__ || []).forEach((actionKey) => this[key][actionKey](data))
         })
       }
     }
