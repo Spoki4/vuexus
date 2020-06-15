@@ -20,7 +20,7 @@ const VuexusGlobalMixin = Vue.extend({
   created() {
     const stores = getClasses(this.$options.stores)
     stores.forEach(([key, StoreClass]) => {
-      // Call Hook.Created handler
+      (StoreClass.prototype.__created__ || []).forEach((actionKey) => this[key][actionKey]())
     })
   },
   watch: {
@@ -28,7 +28,7 @@ const VuexusGlobalMixin = Vue.extend({
       handler() {
         const stores = getClasses(this.$options.stores)
         stores.forEach(([key, StoreClass]) => {
-          // Call Hook.QueryChanged handler
+          (StoreClass.prototype.__queryChanged__ || []).forEach((actionKey) => this[key][actionKey]())
         })
       }
     }

@@ -1,11 +1,9 @@
-import {mutationMetadataKey} from './constants'
-
 export type MutationDescriptor =  TypedPropertyDescriptor<(payload?: any) => any>
 
 export const isMutation = (target, key) => {
-  return Reflect.hasMetadata(mutationMetadataKey, target, key)
+  return (target.__mutations__ || []).includes(key)
 }
 
 export const Mutation = (target, key, _descriptor: MutationDescriptor) => {
-  Reflect.defineMetadata(mutationMetadataKey, {}, target, key)
+  target.__mutations__ = [...(target.__mutations__ || []), key]
 }

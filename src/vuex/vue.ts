@@ -1,5 +1,4 @@
 // TODO: remove eslint-disable
-/* eslint-disable no-unused-vars */
 import Vue from 'vue'
 import {ThisTypedComponentOptionsWithArrayProps, ThisTypedComponentOptionsWithRecordProps} from 'vue/types/options'
 import {ExtendedVue} from 'vue/types/vue'
@@ -17,7 +16,7 @@ type StoresInstances<Stores extends ObjectClass> = {[Key in keyof Stores]: Insta
 declare module 'vue/types/vue' {
   interface VueConstructor<V extends Vue> {
     extend<S extends ObjectClass, Data, Methods, Computed, PropNames extends string = never>(
-      options?: { stores: StoresDefinition<S> } & ThisTypedComponentOptionsWithArrayProps<
+      options?: { stores?: StoresDefinition<S> } & ThisTypedComponentOptionsWithArrayProps<
         StoresInstances<S> & V,
         Data,
         Methods,
@@ -27,7 +26,7 @@ declare module 'vue/types/vue' {
     ): ExtendedVue<V, Data, Methods, Computed, Record<PropNames, any>>
 
     extend<S extends ObjectClass, Data, Methods, Computed, Props>(
-      options?: { stores: StoresDefinition<S> } & ThisTypedComponentOptionsWithRecordProps<
+      options?: { stores?: StoresDefinition<S> } & ThisTypedComponentOptionsWithRecordProps<
         StoresInstances<S> & V,
         Data,
         Methods,

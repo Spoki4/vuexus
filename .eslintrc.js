@@ -23,6 +23,6 @@ module.exports = {
     'semi': ['error', 'never'],
     'block-spacing': 'error',
     'eol-last': ['error', 'always'],
-    'no-unused-vars': ['error', { 'vars': 'all', 'args': 'after-used', 'ignoreRestSiblings': false, 'argsIgnorePattern': '^_' }]
+    'no-unused-vars': 'warn',
   }
 }

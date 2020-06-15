@@ -2,9 +2,9 @@ require('jsdom-global')()
 import {createLocalVue, mount} from '@vue/test-utils'
 import Vue from 'vue'
 import Vuex, {Store as VuexStore} from 'vuex'
-import {Action, clearStoreCache, Mutation, Store, createSubModule} from '../decorators'
-import {Plugin} from '../plugin'
-import '../vue'
+import {Action, Mutation, Store, createSubModule} from '../../decorators'
+import {Plugin} from '../../plugin'
+import '../../vue'
 
 @Store
 class SumSubModule {
@@ -54,7 +54,7 @@ class MainStore {
   }
 }
 
-describe('Vuex e2e', () => {
+describe('Vuexus default use', () => {
   let localVue: typeof Vue
   let store: VuexStore<any>
 
@@ -63,10 +63,6 @@ describe('Vuex e2e', () => {
     localVue.use(Vuex)
     store = new VuexStore({})
     localVue.use(Plugin)
-  })
-
-  afterEach(() => {
-    clearStoreCache(MainStore)
   })
 
   describe('direct access', () => {

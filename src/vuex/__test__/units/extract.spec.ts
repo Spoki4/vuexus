@@ -1,5 +1,5 @@
-import {Action, Store, Mutation, Hook, createSubModule} from '../index'
-import { extractClassToVuex } from '../extract'
+import {Action, Store, Mutation, Hook, createSubModule} from '../../index'
+import { extractClassToVuex } from '../../extract'
 
 @Store
 class TestSubModule {

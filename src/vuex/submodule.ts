@@ -1,5 +1,3 @@
-import 'reflect-metadata'
-
 type SubModule<T> = {
   cls: T,
   type: 'submodule'

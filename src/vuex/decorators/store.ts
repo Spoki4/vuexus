@@ -1,12 +1,5 @@
-import {storeNameMetadataKey} from './constants'
-
 export const Store = (target) => {
-  Reflect.defineMetadata(storeNameMetadataKey, target.name, target)
+  const name = target.name
+  target.__name__ = name
   return target
-}
-
-
-export const clearStoreCache = (cls) => {
-  Reflect.deleteMetadata(storeNameMetadataKey, cls)
-  Store(cls)
 }
